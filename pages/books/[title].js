@@ -1,16 +1,23 @@
 import Head from 'next/head'
-import { useContext } from 'react'
+import { createContext, useContext } from 'react'
 import { fetchAPI } from '../../lib/api'
-import { createMapContext, ContextMap } from '../../lib/context'
+
+const BookContext = createContext(null)
+
+const useBookContext = () => {
+  const context = useContext(BookContext)
+  if (!context) {
+    throw new Error('useBookContext must be used within a BookContext')
+  }
+
+  return context
+}
 
 const BookRootComponent = ({ book }) => {
   const seo = {
     metaTitle: book.attributes.title,
     metaDescription: 'Static description',
   }
-
-  // This would be the context ix
-  const Context = createMapContext('book')
 
   return (
     <>
@@ -24,15 +31,15 @@ const BookRootComponent = ({ book }) => {
         <meta name="twitter:description" content={seo.metaDescription} />
       </Head>
 
-      <Context.Provider value={book}>
+      <BookContext.Provider value={book}>
         <Book />
-      </Context.Provider>
+      </BookContext.Provider>
     </>
   )
 }
 
 const Book = () => {
-  const context = useContext(ContextMap['book'])
+  const context = useBookContext()
 
   return (
     <div>
